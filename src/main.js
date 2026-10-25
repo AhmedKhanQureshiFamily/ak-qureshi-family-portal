@@ -5,6 +5,12 @@ let currentFilter = 'all';
 let searchQuery = '';
 let currentView = 'timeline';
 
+function escapeHtml(str) {
+  return str.replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[ch]));
+}
+
 // Elements
 const statsContainer = document.getElementById('stats-container');
 const timelineStream = document.getElementById('timeline-stream');
@@ -101,10 +107,11 @@ function renderTimeline() {
   if (filteredEvents.length === 0) {
     timelineStream.innerHTML = `
       <div style="text-align: center; padding: 4rem 1rem; color: var(--text-muted);">
-        <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">No family milestones found matching "${searchQuery}"</p>
+        <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">No family milestones found matching "${escapeHtml(searchQuery)}"</p>
         <button class="pill active" onclick="document.getElementById('search-input').value=''; document.getElementById('search-input').dispatchEvent(new Event('input'));">Clear Search</button>
       </div>
     `;
+    updateSpineProgress();
     return;
   }
 
@@ -150,9 +157,10 @@ function renderTimeline() {
               <div class="avatar-circle">${ev.avatarText}</div>
               <span class="avatar-label">${ev.personName}</span>
             </div>
+            ${ev.eventType === 'union' ? '' : `
             <button class="btn-card-details" data-person-id="${ev.personId}" data-event-id="${ev.id}">
               View Profile & Branch
-            </button>
+            </button>`}
           </div>
         </div>
       </div>
@@ -161,31 +169,34 @@ function renderTimeline() {
 
   // Observe nodes for active-node scrolling trigger
   setupTimelineObserver();
+
+  // Timeline height changed, so redraw the spine
+  updateSpineProgress();
 }
 
 // Scroll Progress Tracker: dynamically draws line downwards
+function updateSpineProgress() {
+  if (currentView !== 'timeline') return;
+
+  const timelineWrapper = document.querySelector('.timeline-wrapper');
+  if (!timelineWrapper || !spineProgressFill) return;
+
+  const rect = timelineWrapper.getBoundingClientRect();
+  const windowHeight = window.innerHeight;
+
+  // Trigger line starting from upper portion of screen
+  const startOffset = windowHeight * 0.45;
+  const totalHeight = rect.height - startOffset;
+  const scrolledDistance = Math.max(0, -rect.top + startOffset);
+
+  const progressPercentage = Math.min(100, Math.max(0, (scrolledDistance / totalHeight) * 100));
+  spineProgressFill.style.height = `${progressPercentage}%`;
+}
+
 function setupScrollProgressTracker() {
-  function updateProgress() {
-    if (currentView !== 'timeline') return;
-
-    const timelineWrapper = document.querySelector('.timeline-wrapper');
-    if (!timelineWrapper || !spineProgressFill) return;
-
-    const rect = timelineWrapper.getBoundingClientRect();
-    const windowHeight = window.innerHeight;
-
-    // Trigger line starting from upper portion of screen
-    const startOffset = windowHeight * 0.45;
-    const totalHeight = rect.height - startOffset;
-    const scrolledDistance = Math.max(0, -rect.top + startOffset);
-
-    const progressPercentage = Math.min(100, Math.max(0, (scrolledDistance / totalHeight) * 100));
-    spineProgressFill.style.height = `${progressPercentage}%`;
-  }
-
-  window.addEventListener('scroll', updateProgress, { passive: true });
-  window.addEventListener('resize', updateProgress);
-  updateProgress();
+  window.addEventListener('scroll', updateSpineProgress, { passive: true });
+  window.addEventListener('resize', updateSpineProgress);
+  updateSpineProgress();
 }
 
 // Setup IntersectionObserver for items
