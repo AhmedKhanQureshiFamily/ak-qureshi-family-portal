@@ -107,14 +107,22 @@ Chronological breakdown of the 4 sons and 5 daughters:
 
 ## 💻 Portal Application & Architecture
 
-### Tech Stack
-- **Runtime & Bundler**: Vite 8 + ES Modules (Native 60fps performance)
-- **Typography**: 
-  - `Cinzel` (Classical Heritage English headings)
-  - `Noto Nastaliq Urdu` (Authentic Urdu script calligraphy)
-  - `Plus Jakarta Sans` (Clean modern body text)
-- **Styling**: Vanilla Modern CSS (Glassmorphism, custom properties, responsive grid & flexbox)
-- **Animation**: Scroll-driven dynamic SVG spine with `IntersectionObserver` node illumination and golden connector stems
+### Languages & Frameworks
+- **Languages**:
+  - **JavaScript (ES2022+ / Modern Vanilla JS)**: Core application logic, event-driven interactions, and data filtering.
+  - **HTML5**: Semantic document layout, modal dialog structures, and OpenGraph metadata.
+  - **CSS3 / Vanilla Modern CSS**: Custom properties (tokens), Glassmorphism, CSS Grid & Flexbox, micro-interactions, and media query breakpoints (no heavy CSS utility framework dependencies).
+  - **SQL**: Database schemas (PostgreSQL / Supabase DDL).
+- **Frameworks & Build Tools**:
+  - **Vite 8**: Modern build tool and blazing-fast local development server with Hot Module Replacement (HMR).
+  - **Node.js (v22+) & npm**: Package and dependency management runtime.
+- **Web APIs & Physics**:
+  - **IntersectionObserver API**: Viewport tracking to trigger scroll-driven animations and illuminated node activations.
+  - **Dynamic SVG & CSS Timeline**: Dynamic vertical progress spine and connecting stems drawn to match scroll position.
+- **Typography & Font Rendering**:
+  - **Noto Nastaliq Urdu**: Calligraphic Nastaleeq rendering for Urdu script names.
+  - **Cinzel**: Classical Roman/serif headings for generational titles.
+  - **Plus Jakarta Sans**: High-legibility modern geometric sans-serif for UI elements.
 
 ### Directory Structure
 ```
@@ -132,7 +140,7 @@ ak-qureshi-family-portal/
 ### Running Locally
 ```bash
 # 1. Navigate to the project directory
-cd /home/sunnysjamil/Workspace/ak-qureshi-family-portal
+cd /home/sunnysjamil/Workspace/github.com/ak-qureshi-family-portal
 
 # 2. Install dependencies (if not already installed)
 npm install
