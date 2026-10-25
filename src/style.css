@@ -441,7 +441,7 @@ body {
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 3.5rem;
+  gap: 0;
 }
 
 .timeline-item {
@@ -773,6 +773,124 @@ body {
   background: var(--gold-500);
   color: #090d16;
   border-color: var(--gold-400);
+}
+
+/* TIMELINE PROPORTIONAL TIME-HOP INDICATOR */
+.timeline-time-gap-indicator {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+}
+
+.timeline-time-gap-indicator::before {
+  content: '';
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 50%;
+  height: 1px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.4) 0%, rgba(255, 255, 255, 0.05) 60%, transparent 100%);
+  z-index: 1;
+}
+
+.time-gap-pill {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.25rem 0.85rem;
+  background: #0d1527;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: var(--radius-full);
+  font-family: var(--font-serif);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--gold-400);
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), 0 0 10px rgba(245, 158, 11, 0.15);
+  transition: all 0.3s ease;
+}
+
+.time-gap-pill:hover {
+  border-color: var(--gold-400);
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.25);
+  transform: scale(1.05);
+}
+
+/* TWIN MILESTONE CO-OCCURRENCE STYLES */
+.twin-milestone-item .twin-card {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(245, 158, 11, 0.12);
+}
+
+.twin-badge {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.15)) !important;
+  color: var(--gold-300) !important;
+  border: 1px solid var(--gold-500) !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+}
+
+.twin-node-dot {
+  background: linear-gradient(135deg, var(--gold-400), #eab308) !important;
+  border-color: #fef08a !important;
+  box-shadow: 0 0 0 4px var(--bg-primary), 0 0 15px var(--accent-glow) !important;
+}
+
+.twin-profiles-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+@media (max-width: 600px) {
+  .twin-profiles-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.twin-mini-card {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+}
+
+.twin-mini-card:hover {
+  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(15, 23, 42, 0.9);
+  transform: translateY(-2px);
+}
+
+.twin-mini-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.4rem;
+}
+
+.twin-mini-name {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--gold-100);
+}
+
+.twin-mini-bio {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  flex-grow: 1;
 }
 
 /* HIERARCHICAL FAMILY TREE VIEW */

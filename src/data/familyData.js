@@ -297,7 +297,7 @@ export function getChronologicalTimeline() {
     title: "Birth of Patriarch Ahmed Khan Qureshi",
     role: "Patriarch & Progenitor • بانیِ خاندان",
     generation: 0,
-    desc: "The lineage begins with the birth of Ahmed Khan Qureshi in the 1940s. A figure of quiet dignity, honor, and deep faith.",
+    desc: "The lineage begins with the birth of A. K. Qureshi in the 1940s.",
     isMajorNode: true,
     avatarText: "AKQ"
   });
@@ -306,7 +306,7 @@ export function getChronologicalTimeline() {
   events.push({
     id: "event-matriarch-birth",
     year: familyData.matriarch.birthYear,
-    displayDate: "July 31, 1945",
+    displayDate: "July (31?), 1945",
     personId: familyData.matriarch.id,
     personName: familyData.matriarch.name,
     nameNastaleeq: familyData.matriarch.nameNastaleeq,
@@ -315,12 +315,12 @@ export function getChronologicalTimeline() {
     title: "Birth of Surriya Qureshi",
     role: "Matriarch & Family Anchor • والدہ محترمہ",
     generation: 0,
-    desc: "Birth of Surriya Qureshi on July 31, 1945, whose radiant spirit, warmth, and resilience became the anchor for generations.",
+    desc: "Birth of Surriya Qureshi in July 1945, whose radiant spirit and resilience became the anchor for generations.",
     isMajorNode: true,
     avatarText: "SQ"
   });
 
-  // 3. Sacred Union
+  // 3. Marriage
   events.push({
     id: "event-marriage",
     year: 1963,
@@ -329,11 +329,11 @@ export function getChronologicalTimeline() {
     personName: "Ahmed Khan & Surriya Qureshi",
     nameNastaleeq: "احمد خان اور ثریا قریشی کا عقدِ مسعود",
     eventType: "union",
-    category: "Sacred Union",
-    title: "Holy Union of Ahmed Khan & Surriya",
+    category: "Marriage",
+    title: "Marriage of A. K. & Surriya",
     role: "The Roots Converge • بنیادِ خاندان",
     generation: 0,
-    desc: "Ahmed Khan Qureshi and Surriya marry, creating the unified root from which 9 offspring and dozens of grandchildren blossom.",
+    desc: "A. K. Qureshi and Surriya marry, creating the unified root from which 9 offspring and dozens of grandchildren blossom.",
     isMajorNode: true,
     avatarText: "AK & S"
   });
@@ -380,9 +380,72 @@ export function getChronologicalTimeline() {
     avatarText: "AKQ"
   });
 
+  // Helper to parse date for precise chronological ordering
+  const parseEventSortDate = (displayDate, year) => {
+    if (!displayDate) return new Date(year, 0, 1).getTime();
+    const months = {
+      january: 0, february: 1, march: 2, april: 3, may: 4, june: 5,
+      july: 6, august: 7, september: 8, october: 9, november: 10, december: 11
+    };
+    const m = displayDate.toLowerCase().match(/([a-z]+)\s+(\d{1,2}),?\s*(\d{4})?/);
+    if (m && months[m[1]] !== undefined) {
+      const yr = m[3] ? parseInt(m[3], 10) : year;
+      const day = parseInt(m[2], 10);
+      return new Date(yr, months[m[1]], day).getTime();
+    }
+    return new Date(year, 0, 1).getTime();
+  };
+
   // 6. Grandchildren Births
   familyData.offspring.forEach((child) => {
     child.grandchildren.forEach((gc) => {
+      // Handle the twins Ramsha & Maria as a unified co-occurring birth event
+      if (gc.id === "gc-tabasum-ramsha") {
+        const maria = child.grandchildren.find(g => g.id === "gc-tabasum-maria");
+        events.push({
+          id: `event-twins-ramsha-maria-birth`,
+          year: 1993,
+          displayDate: "August 15, 1993",
+          personId: "twins-ramsha-maria",
+          personName: "Ramsha & Maria Ahmed Qureshi",
+          nameNastaleeq: "رمشاء و ماریا احمد قریشی",
+          parentName: child.name,
+          parentNastaleeq: child.nameNastaleeq,
+          eventType: "birth-grandchild",
+          isTwinMilestone: true,
+          twins: [
+            {
+              id: gc.id,
+              name: gc.name,
+              nameNastaleeq: gc.nameNastaleeq,
+              relation: gc.relation,
+              bio: gc.bio,
+              avatarText: "RQ"
+            },
+            {
+              id: maria.id,
+              name: maria.name,
+              nameNastaleeq: maria.nameNastaleeq,
+              relation: maria.relation,
+              bio: maria.bio,
+              avatarText: "MQ"
+            }
+          ],
+          category: `Twins (Gen 2)`,
+          title: `Birth of Twins: Ramsha & Maria`,
+          role: `Twin Daughters • Generation 2 • Branch of Tabasum (${child.nameNastaleeq})`,
+          generation: 2,
+          desc: `Twin sisters Ramsha and Maria are born together on August 15, 1993, to Tabasum and Amna. Ramsha is married to cousin Larayb Naeem, and Maria is married to Kashif.`,
+          isMajorNode: false,
+          avatarText: "👯"
+        });
+        return;
+      }
+      if (gc.id === "gc-tabasum-maria") {
+        // Already paired with Ramsha above
+        return;
+      }
+
       if (gc.birthYear) {
         events.push({
           id: `event-${gc.id}-birth`,
@@ -442,9 +505,12 @@ export function getChronologicalTimeline() {
     avatarText: "SQ"
   });
 
-  // Sort strictly chronological
+  // Sort strictly chronological with accurate year and month/day order
   events.sort((a, b) => {
     if (a.year !== b.year) return a.year - b.year;
+    const timeA = parseEventSortDate(a.displayDate, a.year);
+    const timeB = parseEventSortDate(b.displayDate, b.year);
+    if (timeA !== timeB) return timeA - timeB;
     const priority = { "birth-patriarch": 1, "birth-matriarch": 2, "union": 3, "birth-child": 4, "passing-patriarch": 5, "birth-grandchild": 6, "passing-child": 7, "passing-matriarch": 8 };
     return (priority[a.eventType] || 99) - (priority[b.eventType] || 99);
   });

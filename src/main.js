@@ -115,15 +115,121 @@ function renderTimeline() {
     return;
   }
 
-  timelineStream.innerHTML = filteredEvents.map((ev, index) => {
+  let prevYear = null;
+  const renderedItems = [];
+
+  filteredEvents.forEach((ev, index) => {
     const isGenesis = ev.personId === 'ahmed-khan-qureshi' || ev.personId === 'surriya-qureshi';
     const isFirstNode = index === 0;
 
-    return `
+    // Calculate time gap in years to scale vertical spacing
+    let gapYears = 0;
+    if (prevYear !== null) {
+      gapYears = Math.max(0, ev.year - prevYear);
+    }
+    prevYear = ev.year;
+
+    // Proportional margin scaling:
+    // 0-year gap: compact (1.25rem)
+    // 1-2 year gap: standard pacing (2.5rem - 3.25rem)
+    // 3-5 year gap: moderate pacing (4rem - 5.5rem)
+    // 6+ year gap: expanded pacing (up to 7rem) with a visual time gap pill
+    let itemMarginTop = 0;
+    let showTimeHopIndicator = false;
+
+    if (index > 0) {
+      if (gapYears === 0) {
+        itemMarginTop = 1.25;
+      } else if (gapYears === 1) {
+        itemMarginTop = 2.5;
+      } else if (gapYears === 2) {
+        itemMarginTop = 3.25;
+      } else if (gapYears >= 3 && gapYears <= 5) {
+        itemMarginTop = 3.25 + (gapYears - 2) * 0.75; // 4rem to 5.5rem
+      } else {
+        itemMarginTop = Math.min(8.0, 5.5 + (gapYears - 5) * 0.45); // Clamped up to 8rem
+        showTimeHopIndicator = true;
+      }
+    }
+
+    // Insert visual time-hop indicator across spine for significant gaps (>= 3 years)
+    if (showTimeHopIndicator && gapYears >= 3) {
+      renderedItems.push(`
+        <div class="timeline-time-gap-indicator" style="margin: 1.5rem 0;" title="${gapYears} years between milestones">
+          <div class="time-gap-pill">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>+${gapYears} Years</span>
+          </div>
+        </div>
+      `);
+    }
+
+    // If this is a twin milestone, render customized twin card
+    if (ev.isTwinMilestone && ev.twins) {
+      renderedItems.push(`
+        <div class="timeline-item twin-milestone-item ${isFirstNode ? 'active-node' : ''}" 
+             data-id="${ev.id}" 
+             data-year="${ev.year}"
+             data-category="${ev.category}"
+             style="${index > 0 ? `margin-top: ${itemMarginTop}rem;` : ''}">
+          
+          <!-- Year Tag on opposite side -->
+          <div class="timeline-year-tag">
+            <span>${ev.displayDate}</span>
+          </div>
+
+          <!-- Central Timeline Node Dot with Twin Badge Icon -->
+          <div class="timeline-node">
+            <div class="node-dot twin-node-dot" title="${ev.title} (${ev.displayDate})"></div>
+          </div>
+
+          <!-- Timeline Information Card with Dual Twin Profiles -->
+          <div class="timeline-card twin-card">
+            <div class="card-header-row">
+              <span class="category-badge twin-badge">Twin Birth • جڑواں بہنیں</span>
+              <span class="date-pill">${ev.displayDate}</span>
+            </div>
+
+            <h3 class="card-title">${ev.title}</h3>
+            ${ev.nameNastaleeq ? `<div class="card-nastaleeq-name">${ev.nameNastaleeq}</div>` : ''}
+
+            <div class="card-subtitle">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>${ev.role}</span>
+            </div>
+
+            <p class="card-desc">${ev.desc}</p>
+
+            <!-- Dual Twin Profile Subcards -->
+            <div class="twin-profiles-row">
+              ${ev.twins.map(twin => `
+                <div class="twin-mini-card">
+                  <div class="twin-mini-header">
+                    <div class="avatar-circle">${twin.avatarText}</div>
+                    <div>
+                      <div class="twin-mini-name">${twin.name}</div>
+                      <div class="card-nastaleeq-name" style="font-size: 1.15rem; margin: 0;">${twin.nameNastaleeq}</div>
+                    </div>
+                  </div>
+                  <div class="twin-mini-bio">${twin.bio}</div>
+                  <button class="btn-card-details" data-person-id="${twin.id}" style="margin-top: 0.5rem; width: 100%; font-size: 0.75rem; padding: 0.4rem 0.6rem;">
+                    View ${twin.name.split(' ')[0]}'s Profile
+                  </button>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `);
+      return;
+    }
+
+    renderedItems.push(`
       <div class="timeline-item ${isGenesis ? 'genesis-node' : ''} ${isFirstNode ? 'active-node' : ''}" 
            data-id="${ev.id}" 
            data-year="${ev.year}"
-           data-category="${ev.category}">
+           data-category="${ev.category}"
+           style="${index > 0 ? `margin-top: ${itemMarginTop}rem;` : ''}">
         
         <!-- Year Tag on opposite side -->
         <div class="timeline-year-tag">
@@ -164,8 +270,10 @@ function renderTimeline() {
           </div>
         </div>
       </div>
-    `;
-  }).join('');
+    `);
+  });
+
+  timelineStream.innerHTML = renderedItems.join('');
 
   // Observe nodes for active-node scrolling trigger
   setupTimelineObserver();
