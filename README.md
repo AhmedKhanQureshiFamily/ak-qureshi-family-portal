@@ -222,3 +222,25 @@ A joint venture between cousins descending from Ahmed Khan Qureshi of Karachi, P
 - [ ] Member dashboards / profile spaces for each descendant branch.
 - [ ] Archival photos and voice recordings of elders.
 
+### Known Bugs
+- [ ] **Dead profile button on the marriage card**: the "Holy Union" timeline event uses `personId: "union-ahmed-surriya"` (`src/data/familyData.js`), which matches no person, so `openPersonProfileModal` returns silently and "View Profile & Branch" does nothing.
+- [ ] **Impossible birth year**: Aimen Tauseef Qureshi has `birthYear: 1970` in `familyData.js`, but the father, Tauseef, was born c. 1966. The source note only gives "May 6", so the year needs to be confirmed or removed.
+- [ ] **Footer dates disagree with the data**: `index.html` says "Union (1964) • Offspring (1965–1977)"; the dataset has the marriage in 1963 and the births spanning 1963–1976.
+- [ ] **Unescaped search text**: the empty-state message in `src/main.js` inserts the raw search query into `innerHTML`.
+- [ ] **Stale timeline spine**: the scroll-progress line is not recalculated after a filter or search changes the timeline height, so it is wrong until the next scroll or resize.
+- [ ] **Grandchildren count includes step-children**: the hero stat counts Umar Khan and Ammarah Jabeen (step-children of Tabasum), giving 35. `totalGenerations` and `spanYears` are also hardcoded rather than derived from the data.
+
+### Missing Items & Gaps
+- [ ] **Data verification**: details in `familyData.js` that are not in this README need checking with the family or removing, such as the patriarch's and matriarch's birthplace ("Punjab"), "a respected family known for trade and scholarship", and the exact patriarch death year (1978, currently a guess behind "Late 1970s").
+- [ ] **Missing dates**: birth years for Usman and Ammar Tauseef, Umaima, Iman, Umar Khan, Tuba, Shanoo, Nael, Mariam and Zara; death dates for Tauseef and Lubna; exact marriage dates; Tassawar's birth year ("Pending Verification").
+- [ ] **Data model**: spouses are plain strings, not people, and grandchildren are nested under one parent. Cousin marriages (Larayb & Ramsha), in-laws and great-grandchildren cannot be represented. Move to a flat `people[]` plus `relationships[]` shape that matches the SQL blueprint above.
+- [ ] **Uncertain dates in the schema**: the SQL blueprint has no field for approximate or disputed dates ("c. 1963", "March 23, 1970 / March 24, 1969 per visa"). Add a date-precision flag and an alternate-date field.
+- [ ] **Schema drift**: the SQL in this README and the one in the DB Architecture modal (`src/main.js`) differ (`last_name` and `birth_year` nullability). Keep a single source.
+- [ ] **Privacy of living members**: full names and exact birthdates of living people, including minors, are in a static site that is planned for public hosting. Decide what to hide or gate behind login before sharing the URL.
+- [ ] **Accessibility**: modals do not update `aria-hidden`, trap focus or restore it on close; the view toggle buttons lack `aria-pressed`; Urdu text has no `lang="ur"` / `dir="rtl"`.
+- [ ] **Favicon**: `public/favicon.svg` exists but `index.html` does not link it.
+- [ ] **Leftover Vite scaffold**: `src/counter.js`, `src/assets/hero.png`, `src/assets/javascript.svg`, `src/assets/vite.svg` and `public/icons.svg` are unused.
+- [ ] **Inline styles**: `src/main.js` templates carry many inline `style` attributes that belong in `src/style.css`.
+- [ ] **Run instructions**: "Running Locally" points at another contributor's local path; replace it with a generic `cd` into the cloned repo.
+- [ ] **Tooling**: no tests, linting, CI or deployment config.
+
